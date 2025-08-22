@@ -71,7 +71,5 @@ Step 4: setup AWS and requirements
 
     Create an IAM user with these policies:
 
-    AWSLambdaFullAccess
-    IAMFullAccess (if using SAM/Serverless)
-    CloudFormationFullAccess (if using SAM/Serverless)
+    AWSLambda_FullAccess
     S3FullAccess (for deployment artifacts)
