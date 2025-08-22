@@ -25,21 +25,21 @@ jobs:
       - name: Create deployment package
         run: zip -r function.zip src/ node_modules/
 
-      # - name: Run tests
-      #   run: npm test
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
-      - name: Create or Update Lambda function
+
+      - name: Deploy to Lambda
         run: |
-          if ! aws lambda update-function-code \
+          # Try to update existing function first
+          if aws lambda update-function-code \
             --function-name my-lambda-function \
-            --zip-file fileb://function.zip; then
-            
+            --zip-file fileb://function.zip 2>/dev/null; then
+            echo "Function updated successfully"
+          else
             echo "Function doesn't exist, creating it..."
             aws lambda create-function \
               --function-name my-lambda-function \
@@ -49,10 +49,3 @@ jobs:
               --zip-file fileb://function.zip \
               --description "My Lambda function deployed via CI/CD"
           fi
-
-      - name: Deploy to Lambda
-        run: |
-          zip -r function.zip src/ node_modules/
-          aws lambda update-function-code \
-            --function-name my-lambda-function \
-            --zip-file fileb://function.zip
