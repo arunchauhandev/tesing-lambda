@@ -32,9 +32,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Deploy to Lambda ko
+      - name: Deploy to Lambda
         run: |
           # Try to update existing function first
-          --function-name my-lambda-function \
-          --zip-file fileb://function.zip 2>/dev/null; then
-          echo "Function updated successfully"
+          if aws lambda update-function-code \
+            --function-name my-lambda-function \
+            --zip-file fileb://function.zip 2>/dev/null; then
+            echo "Function updated successfully"
+          else
+            echo "Update failed, function might not exist. Consider creating it first."
+            exit 1
+          fi
