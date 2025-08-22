@@ -32,7 +32,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Deploy to Lambda
+      - name: Deploy to Lambda ko
         run: |
           # Try to update existing function first
           if aws lambda update-function-code \
