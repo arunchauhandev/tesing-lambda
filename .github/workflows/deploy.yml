@@ -32,20 +32,64 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Deploy to Lambda ko
+      - name: Create IAM role if it doesn't exist
         run: |
-          # Try to update existing function first
-          if aws lambda update-function-code \
-            --function-name my-lambda-function \
-            --zip-file fileb://function.zip 2>/dev/null; then
-            echo "Function updated successfully"
+          if ! aws iam get-role --role-name lambda-execution-role >/dev/null 2>&1; then
+            echo "Creating IAM role..."
+            
+            cat > trust-policy.json << EOF
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "lambda.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+              }
+            ]
+          }
+          EOF
+            
+            aws iam create-role \
+              --role-name lambda-execution-role \
+              --assume-role-policy-document file://trust-policy.json
+            
+            aws iam attach-role-policy \
+              --role-name lambda-execution-role \
+              --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+            
+            echo "Waiting for role to propagate..."
+            sleep 30  # Increased wait time
           else
-            echo "Function doesn't exist, creating it..."
-            aws lambda create-function \
-              --function-name my-lambda-function \
-              --runtime nodejs18.x \
-              --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/lambda-execution-role \
-              --handler src/index.handler \
-              --zip-file fileb://function.zip \
-              --description "My Lambda function deployed via CI/CD"
+            echo "Role already exists"
           fi
+
+      - name: Wait for role propagation
+        run: |
+          echo "Ensuring role is fully propagated..."
+          for i in {1..12}; do
+            if aws sts get-caller-identity > /dev/null 2>&1; then
+              echo "AWS credentials working, attempt $i"
+              sleep 5
+            fi
+          done
+
+          - name: Deploy to Lambda ko
+            run: |
+              # Try to update existing function first
+              if aws lambda update-function-code \
+                --function-name my-lambda-function \
+                --zip-file fileb://function.zip 2>/dev/null; then
+                echo "Function updated successfully"
+              else
+                echo "Function doesn't exist, creating it..."
+                aws lambda create-function \
+                  --function-name my-lambda-function \
+                  --runtime nodejs18.x \
+                  --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/lambda-execution-role \
+                  --handler src/index.handler \
+                  --zip-file fileb://function.zip \
+                  --description "My Lambda function deployed via CI/CD"
+              fi
