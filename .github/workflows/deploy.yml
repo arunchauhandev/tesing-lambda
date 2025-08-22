@@ -20,7 +20,27 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --production
+
+      - name: Create deployment package
+        run: zip -r function.zip src/ node_modules/
+
+      - name: Create or Update Lambda function
+        run: |
+          # Try to update first, if it fails, create the function
+          if ! aws lambda update-function-code \
+            --function-name my-lambda-function \
+            --zip-file fileb://function.zip; then
+            
+            echo "Function doesn't exist, creating it..."
+            aws lambda create-function \
+              --function-name my-lambda-function \
+              --runtime nodejs18.x \
+              --role arn:aws:iam::YOUR_ACCOUNT_ID:role/lambda-execution-role \
+              --handler src/index.handler \
+              --zip-file fileb://function.zip \
+              --description "My Lambda function deployed via CI/CD"
+          fi
 
       # - name: Run tests
       #   run: npm test
