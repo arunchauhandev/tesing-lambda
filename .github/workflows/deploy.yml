@@ -35,17 +35,6 @@ jobs:
       - name: Deploy to Lambda ko
         run: |
           # Try to update existing function first
-          if aws lambda update-function-code \
-            --function-name my-lambda-function \
-            --zip-file fileb://function.zip 2>/dev/null; then
-            echo "Function updated successfully"
-          else
-            echo "Function doesn't exist, creating it..."
-            aws lambda create-function \
-              --function-name my-lambda-function \
-              --runtime nodejs18.x \
-              --role arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/lambda-execution-role \
-              --handler src/index.handler \
-              --zip-file fileb://function.zip \
-              --description "My Lambda function deployed via CI/CD"
-          fi
+          --function-name my-lambda-function \
+          --zip-file fileb://function.zip 2>/dev/null; then
+          echo "Function updated successfully"
