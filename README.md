@@ -94,6 +94,12 @@ Step 7: Create a lambda function
     select the created role
 
 
+step 8: Update your created lambda function in YAML file
 
+    find: if aws lambda update-function-code \
+    your can see your previous configured lambda function, now you have to replace by the new created lambda function
+
+
+step 9: now you have to push your code and see action
 
     and done it - welcom
