@@ -83,12 +83,12 @@ Step 6: create the role in AWS Console:
     Go to IAM → Roles → Create role
     Select "Lambda" service
     Add AWSLambdaBasicExecutionRole permission
-    Name it lambda-execution-role
+    keep the name like lambda-execution-role (as your choice)
 
 Step 7: Create a lambda function
 
-    Setup serverfile path: function -> code -> Runtime settings -> handler
+    target your index.js file (server.js): function -> code -> Runtime settings -> handler
     configure your index.js file path like: src/index.js
 
-    Configure Role: function -> configuration ->edit-> Existing role
+    Configure Role: function -> configuration -> edit -> Existing role
     select the created role
