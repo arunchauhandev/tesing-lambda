@@ -67,9 +67,28 @@ Step 3: use provided YAML
                 exit 1
             fi
 
-Step 4: setup AWS and requirements
-
-    Create an IAM user with these policies:
+Step 4: Create an IAM user with these policies:
 
     AWSLambda_FullAccess
     S3FullAccess (for deployment artifacts)
+
+Step 5: Github - Environment Variables/Secrets
+Add these to your CI/CD platform's secrets:
+
+        AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY
+
+Step 6: create the role in AWS Console:
+
+    Go to IAM → Roles → Create role
+    Select "Lambda" service
+    Add AWSLambdaBasicExecutionRole permission
+    Name it lambda-execution-role
+
+Step 7: Create a lambda function
+
+    Setup serverfile path: function -> code -> Runtime settings -> handler
+    configure your index.js file path like: src/index.js
+
+    Configure Role: function -> configuration ->edit-> Existing role
+    select the created role
