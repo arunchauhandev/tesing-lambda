@@ -36,7 +36,7 @@ jobs:
         run: |
           # Try to update existing function first
           if aws lambda update-function-code \
-            --function-name my-lambda-function \
+            --function-name testing-node-app-deployment \
             --zip-file fileb://function.zip 2>/dev/null; then
             echo "Function updated successfully"
           else
