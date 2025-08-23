@@ -1,4 +1,4 @@
-Note: Deploy node function to lambda steps
+Note: Deploy to lambda a node function steps
 
 Step 1: Create Project Structure like this
 
