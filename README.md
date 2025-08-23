@@ -92,3 +92,8 @@ Step 7: Create a lambda function
 
     Configure Role: function -> configuration -> edit -> Existing role
     select the created role
+
+
+
+
+    and done it - welcom
